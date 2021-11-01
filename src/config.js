@@ -41,6 +41,8 @@ const layerConfigurations = [
   },
 ];
 
+const useDnaAsImageName = false;
+
 const shuffleLayerConfigurations = false;
 
 const debugLogs = false;
@@ -69,6 +71,18 @@ const text = {
   family: "Courier",
   spacer: " => ",
 };
+
+const hashtag = {
+  hashtag: false,
+  prefix: '',
+  suffix: '',
+  color: "#000000",
+  size: 14,
+  xGap: 20,
+  yGap: 40,
+  weight: "600",
+  family: "Sans",
+}
 
 const pixelFormat = {
   ratio: 2 / 128,
@@ -112,11 +126,13 @@ module.exports = {
   layerConfigurations,
   rarityDelimiter,
   preview,
+  useDnaAsImageName,
   shuffleLayerConfigurations,
   debugLogs,
   extraMetadata,
   pixelFormat,
   text,
+  hashtag,
   namePrefix,
   network,
   solanaMetadata,

@@ -20,10 +20,12 @@ const {
   uniqueDnaTorrance,
   layerConfigurations,
   rarityDelimiter,
+  useDnaAsImageName,
   shuffleLayerConfigurations,
   debugLogs,
   extraMetadata,
   text,
+  hashtag,
   namePrefix,
   network,
   solanaMetadata,
@@ -139,7 +141,7 @@ const addMetadata = (_dna, _edition) => {
   let tempMetadata = {
     name: `${namePrefix} #${_edition}`,
     description: description,
-    image: `${baseUri}/${_edition}.png`,
+    image: !useDnaAsImageName ? `${baseUri}/${_edition}.png` : `${baseUri}/${sha1(_dna)}.png`,
     dna: sha1(_dna),
     edition: _edition,
     date: dateTime,
@@ -192,6 +194,14 @@ const loadLayerImg = async (_layer) => {
   });
 };
 
+const addHashtag = (_index) => {
+  if(hashtag.hashtag) {
+    ctx.fillStyle = hashtag.color;
+    ctx.font = `${hashtag.weight} ${hashtag.size}pt ${hashtag.family}`;
+    ctx.fillText(`${hashtag.prefix}#${_index}${hashtag.suffix}`, hashtag.xGap, hashtag.yGap);
+  }
+};
+
 const addText = (_sig, x, y, size) => {
   ctx.fillStyle = text.color;
   ctx.font = `${text.weight} ${size}pt ${text.family}`;
@@ -234,6 +244,22 @@ const constructLayerToDna = (_dna = "", _layers = []) => {
     };
   });
   return mappedDnaToLayers;
+};
+
+const reconstructLayersFromMetadata = (_metadata = "", _layers = []) => {
+  let mappedMetadataToLayers = _layers.map((layer, index) => {
+
+    let selectedElement = layer.elements.find(
+      (e) => e.name == _metadata[index].value
+    );
+    return {
+      name: layer.name,
+      blend: layer.blend,
+      opacity: layer.opacity,
+      selectedElement: selectedElement,
+    };
+  });
+  return mappedMetadataToLayers;
 };
 
 /**
@@ -315,7 +341,7 @@ const saveMetaDataSingleFile = (_editionCount) => {
       )
     : null;
   fs.writeFileSync(
-    `${buildDir}/json/${_editionCount}.json`,
+    (!useDnaAsImageName ? `${buildDir}/json/${_editionCount}.json` : `${buildDir}/json/${metadata.dna}.json`),
     JSON.stringify(metadata, null, 2)
   );
 };
@@ -356,6 +382,8 @@ const startCreating = async () => {
     const layers = layersSetup(
       layerConfigurations[layerConfigIndex].layersOrder
     );
+
+    
     while (
       editionCount <= layerConfigurations[layerConfigIndex].growEditionSizeTo
     ) {
@@ -367,7 +395,7 @@ const startCreating = async () => {
         results.forEach((layer) => {
           loadedElements.push(loadLayerImg(layer));
         });
-
+        
         await Promise.all(loadedElements).then((renderObjectArray) => {
           debugLogs ? console.log("Clearing canvas") : null;
           ctx.clearRect(0, 0, format.width, format.height);
@@ -375,7 +403,7 @@ const startCreating = async () => {
             hashlipsGiffer = new HashlipsGiffer(
               canvas,
               ctx,
-              `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
+              `${buildDir}/gifs/${(!useDnaAsImageName? abstractedIndexes[0] : sha1(newDna))}.gif`,
               gif.repeat,
               gif.quality,
               gif.delay
@@ -391,6 +419,8 @@ const startCreating = async () => {
               index,
               layerConfigurations[layerConfigIndex].layersOrder.length
             );
+            // Add hashtag to image
+            addHashtag((!useDnaAsImageName? abstractedIndexes[0] : sha1(newDna)));
             if (gif.export) {
               hashlipsGiffer.add();
             }
@@ -401,7 +431,7 @@ const startCreating = async () => {
           debugLogs
             ? console.log("Editions left to create: ", abstractedIndexes)
             : null;
-          saveImage(abstractedIndexes[0]);
+          saveImage((!useDnaAsImageName? abstractedIndexes[0] : sha1(newDna)));
           addMetadata(newDna, abstractedIndexes[0]);
           saveMetaDataSingleFile(abstractedIndexes[0]);
           console.log(
@@ -429,4 +459,92 @@ const startCreating = async () => {
   writeMetaData(JSON.stringify(metadataList, null, 2));
 };
 
-module.exports = { startCreating, buildSetup, getElements };
+const buildSetupRecreating = () => {
+  if(fs.existsSync(buildDir)) {
+    if(fs.existsSync(path.join(buildDir, "/images"))) {
+      fs.rmdirSync(path.join(buildDir, "/images"), { recursive: true });
+    }
+    if(gif.export) {
+      fs.rmdirSync(path.join(buildDir, "/gifs"), { recursive: true });
+    }
+
+    fs.mkdirSync(path.join(buildDir, "/images"));
+    if (gif.export) {
+      fs.mkdirSync(path.join(buildDir, "/gifs"));
+    }
+  }
+};
+
+const startRecreating = async () => {
+  // Read the metadata 
+  let jsonString = fs.readFileSync(`${buildDir}/json/_metadata.json`).toString();
+  let metadataArr = JSON.parse(jsonString);
+
+  let layerConfigIndex = 0;
+  let editionCount = 1;
+  let abstractedIndexes = [];
+  for (let i = network == NETWORK.sol ? 0 : 1; i <= layerConfigurations[layerConfigurations.length - 1].growEditionSizeTo; i++) {
+    abstractedIndexes.push(i);
+  }
+  if (shuffleLayerConfigurations) {
+    abstractedIndexes = shuffle(abstractedIndexes);
+  }
+  while (layerConfigIndex < layerConfigurations.length) {
+    const layers = layersSetup(layerConfigurations[layerConfigIndex].layersOrder);
+
+    while (editionCount <= layerConfigurations[layerConfigIndex].growEditionSizeTo) {
+      let results = reconstructLayersFromMetadata(metadataArr[(abstractedIndexes[0]-1)].attributes, layers);
+      let loadedElements = [];
+
+      results.forEach((layer) => {
+        loadedElements.push(loadLayerImg(layer));
+      });
+      
+      await Promise.all(loadedElements).then((renderObjectArray) => {
+        debugLogs ? console.log("Clearing canvas") : null;
+        ctx.clearRect(0, 0, format.width, format.height);
+        if (gif.export) {
+          hashlipsGiffer = new HashlipsGiffer(
+            canvas,
+            ctx,
+            `${buildDir}/gifs/${abstractedIndexes[0]}.gif`,
+            gif.repeat,
+            gif.quality,
+            gif.delay
+          );
+          hashlipsGiffer.start();
+        }
+        if (background.generate) {
+          drawBackground();
+        }
+        renderObjectArray.forEach((renderObject, index) => {
+          drawElement(
+            renderObject,
+            index,
+            layerConfigurations[layerConfigIndex].layersOrder.length
+          );
+          // Add hashtag to image
+          addHashtag(abstractedIndexes[0]);
+          if (gif.export) {
+            hashlipsGiffer.add();
+          }
+        });
+        if (gif.export) {
+          hashlipsGiffer.stop();
+        }
+        debugLogs
+          ? console.log("Editions left to create: ", abstractedIndexes)
+          : null;
+        saveImage(abstractedIndexes[0]);
+        console.log(
+          `Rereated edition: ${abstractedIndexes[0]}, with DNA: ${metadataArr[(abstractedIndexes[0]-1)].dna}`
+        );
+      });
+      editionCount++;
+      abstractedIndexes.shift();
+    }
+    layerConfigIndex++;
+  }
+};
+
+module.exports = { startCreating, buildSetup, getElements, startRecreating, buildSetupRecreating };
