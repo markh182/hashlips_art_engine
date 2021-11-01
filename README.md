@@ -343,7 +343,7 @@ npm run pixel_evolve
 ```
 
 All your gifs will be outputted in the `/build/pixel_evolve_gifs` directory.
-To set the amount of images the gif cycles through you can change the amount of ratio objects arein the ratios property on the `pixelEvolve` object in the `src/config.js` file. The lower the number on the left, the more pixelated the image will be.
+To set the amount of images the gif cycles through you can change the amount of ratio objects in the ratios property on the `pixelEvolve` object in the `src/config.js` file. Also, the lower the left number of the ratio property, the more pixelated the image will be.
 
 You can also play around with the `repeat`, `quality` and the `delay` of the exported gifs.
 
@@ -368,6 +368,8 @@ const pixelEvolve = {
 ```
 
 ### Re-Generate a collection
+
+You accidentlly deleted all your generated images or you realized that a layer was faulty and needed correcting. As long as the metadata files are still available you can recreate all the images and gifs.
 
 Re-Create your collection, run:
 
