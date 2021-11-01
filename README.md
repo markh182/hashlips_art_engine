@@ -247,6 +247,29 @@ Create a preview image collage of your collection, run:
 npm run preview
 ```
 
+### Generate a preview gif
+
+Create a preview gif of your collection, run:
+
+```sh
+npm run preview_gif
+```
+
+In the `src/config.js` file you can also play around with the `numberOfImages`, `order`, `repeat`, `quality` and the `delay` of the exported gif.
+
+Setting the `repeat: -1` will produce a one time render and `repeat: 0` will loop forever.
+
+```js
+const preview_gif = {
+  numberOfImages: 5,
+  order: "ASC", // ASC, DESC, MIXED
+  repeat: 0,
+  quality: 100,
+  delay: 500,
+  imageName: "preview.gif",
+};
+```
+
 ### Generate pixelated images from collection
 
 In order to convert images into pixelated images you would need a list of images that you want to convert. So run the generator first.
@@ -266,7 +289,35 @@ const pixelFormat = {
 };
 ```
 
-### Generate pixelated images from collection
+### Generate images with a hashtag
+
+In order to create images with a hashtag on it you just need to set the hashtag on the `hashtag` object in the `src/config.js` file to `true`.
+
+Then simply run this command:
+
+```sh
+npm run generate
+or 
+npm run regenerate
+```
+
+All your images will be outputted in the `/build/` directory. You can also play around with the `prefix`, `suffix`, `color`, `size`, `xGap`, `yGap`, `weight` and the `family`.
+
+```js
+const hashtag = {
+  hashtag: false,
+  prefix: '',
+  suffix: '',
+  color: "#000000",
+  size: 14,
+  xGap: 20,
+  yGap: 40,
+  weight: "600",
+  family: "Sans",
+}
+```
+
+### Generate gifs from collection
 
 In order to export gifs based on the layers created, you just need to set the export on the `gif` object in the `src/config.js` file to `true`. You can also play around with the `repeat`, `quality` and the `delay` of the exported gif.
 
@@ -279,6 +330,14 @@ const gif = {
   quality: 100,
   delay: 500,
 };
+```
+
+### Re-Generate a collection
+
+Re-Create your collection, run:
+
+```sh
+npm run regenerate
 ```
 
 ### Printing rarity data (Experimental feature)
