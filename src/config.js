@@ -88,6 +88,22 @@ const pixelFormat = {
   ratio: 2 / 128,
 };
 
+const pixelEvolve = {
+  ratios: [
+    { ratio: 1 / 128, },
+    { ratio: 2 / 128, },
+    { ratio: 4 / 128, },
+    { ratio: 8 / 128, },
+    { ratio: 16 / 128, },
+    { ratio: 32 / 128, },
+    { ratio: 64 / 128, },
+    { ratio: 128 / 128, }
+  ],
+  repeat: 0,
+  quality: 100,
+  delay: 500
+};
+
 const background = {
   generate: true,
   brightness: "80%",
@@ -131,6 +147,7 @@ module.exports = {
   debugLogs,
   extraMetadata,
   pixelFormat,
+  pixelEvolve,
   text,
   hashtag,
   namePrefix,

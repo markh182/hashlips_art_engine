@@ -332,6 +332,41 @@ const gif = {
 };
 ```
 
+### Generate evolving gifs from collection
+
+In order to convert images into evolving pixelated gifs you would need a list of images that you want to convert. So run the generator first.
+
+Then simply run this command:
+
+```sh
+npm run pixel_evolve
+```
+
+All your gifs will be outputted in the `/build/pixel_evolve_gifs` directory.
+To set the amount of images the gif cycles through you can change the amount of ratio objects arein the ratios property on the `pixelEvolve` object in the `src/config.js` file. The lower the number on the left, the more pixelated the image will be.
+
+You can also play around with the `repeat`, `quality` and the `delay` of the exported gifs.
+
+Setting the `repeat: -1` will produce a one time render and `repeat: 0` will loop forever.
+
+```js
+const pixelEvolve = {
+  ratios: [
+    { ratio: 1 / 128, },
+    { ratio: 2 / 128, },
+    { ratio: 4 / 128, },
+    { ratio: 8 / 128, },
+    { ratio: 16 / 128, },
+    { ratio: 32 / 128, },
+    { ratio: 64 / 128, },
+    { ratio: 128 / 128, }
+  ],
+  repeat: 0,
+  quality: 100,
+  delay: 500
+};
+```
+
 ### Re-Generate a collection
 
 Re-Create your collection, run:
