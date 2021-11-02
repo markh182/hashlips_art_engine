@@ -377,6 +377,32 @@ Re-Create your collection, run:
 npm run regenerate
 ```
 
+### Printing rarest images in your collection
+
+To see the top rarest in your collection, run:
+
+```sh
+npm run rarest
+```
+
+In order to list your rarest images created, you just need to set top in the `rarest` object in the `src/config.js` file to a number higher than zero.
+
+The output will look something like this:
+
+```sh
+The top 10 rarest in this collection are:
+1. Your Collection #65
+2. Your Collection #97
+3. Your Collection #52
+4. Your Collection #28
+5. Your Collection #72
+6. Your Collection #75
+7. Your Collection #98
+8. Your Collection #71
+9. Your Collection #100
+10. Your Collection #26
+```
+
 ### Printing rarity data (Experimental feature)
 
 To see the percentages of each attribute across your collection, run:

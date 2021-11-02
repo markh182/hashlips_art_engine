@@ -20,7 +20,8 @@
     "update_info": "node utils/update_info.js",
     "preview_gif": "node utils/preview_gif.js",
     "regenerate": "node utils/regenerate.js",
-    "pixel_evolve": "node utils/pixel_evolve.js"
+    "pixel_evolve": "node utils/pixel_evolve.js",
+    "rarest": "node utils/rarest.js"
   },
   "author": "Daniel Eugene Botha (HashLips)",
   "license": "MIT",

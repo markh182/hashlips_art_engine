@@ -133,6 +133,10 @@ const preview_gif = {
   imageName: "preview.gif",
 };
 
+const rarest = {
+  top: 10
+};
+
 module.exports = {
   format,
   baseUri,
@@ -155,4 +159,5 @@ module.exports = {
   solanaMetadata,
   gif,
   preview_gif,
+  rarest,
 };
